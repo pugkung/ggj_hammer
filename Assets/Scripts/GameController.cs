@@ -56,7 +56,7 @@ public class GameController : MonoBehaviour
         }
         else if (!isPaused)
         {
-            // update timer
+            timer -= Time.deltaTime;
         }
     }
 
@@ -71,7 +71,7 @@ public class GameController : MonoBehaviour
     void updateUIElements()
     {
         scoreText.text = "Score: " + score.ToString();
-        timerText.text = "Time: " + Mathf.Floor(timer / 1.0f).ToString();
+        timerText.text = "Time: " + Mathf.Floor((timer + 1.0f) / 1.0f).ToString();
     }
 
     void readInput()
@@ -86,7 +86,10 @@ public class GameController : MonoBehaviour
 
     void gotoGameOver()
     {
-
+        actionText.text = "Time Over";
+        actionUI.SetActive(true);
+        pauseButton.SetActive(false);
+        StartCoroutine(delayAndReturntoMainMenu());
     }
 
     void addScore(int points)
@@ -121,6 +124,12 @@ public class GameController : MonoBehaviour
         acceptInput = false;
         yield return new WaitForSeconds(penaltyTime);
         acceptInput = true;
+    }
+
+    IEnumerator delayAndReturntoMainMenu()
+    {
+        yield return new WaitForSeconds(countInSeconds);
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
     }
 
     public void pauseGame()
