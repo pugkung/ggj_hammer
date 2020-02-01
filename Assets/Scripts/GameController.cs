@@ -6,7 +6,8 @@ public class GameController : MonoBehaviour
 {
     public float timeLimit;
     public int countInSeconds;
-    public float hitTreshold;
+    public float hitTresholdVelocity;
+    public float resetTresholdVectorX;
     public float checkDelay;
 
     public GameObject timerUI;
@@ -29,8 +30,18 @@ public class GameController : MonoBehaviour
     private bool acceptInput;
     private bool isPaused;
 
+    private Vector3 input;
+    private Vector3 prevInput; // previous frame
+    private Vector3 smoothedAccel;
+    private float inputX;
+    private float prevX;
+    private float velocity; // d(x)
+    private bool isHitting;
+    private AudioSource audio;
+
     void Start()
     {
+        initGame();
         mapElements();
 
         showGameUI(false);
@@ -60,32 +71,75 @@ public class GameController : MonoBehaviour
         }
     }
 
+    void initGame()
+    {
+        isHitting = false;
+        score = 0;
+        isPaused = false;
+    }
+
     void mapElements()
     {
         actionText = actionUI.GetComponent<Text>();
         scoreText = scoreUI.GetComponent<Text>();
         timerText = timerUI.GetComponent<Text>();
         hammerRect = hammerSprite.GetComponent<RectTransform>();
+
+        audio = GetComponent<AudioSource>();
     }
 
     void updateUIElements()
     {
         scoreText.text = "Score: " + score.ToString();
-        timerText.text = "Time: " + Mathf.Floor((timer + 1.0f) / 1.0f).ToString();
+        timerText.text = Mathf.Floor((timer + 1.0f) / 1.0f).ToString();
     }
 
     void readInput()
     {
-        animateHammer(75.0f);
+        prevInput = input;
+        input = Input.acceleration;
+
+        prevX = prevInput.x;
+        inputX = Mathf.Abs(input.x);
+        velocity = (inputX - prevX) / Time.deltaTime;
+
+        if (velocity > hitTresholdVelocity && !isHitting)
+        {
+            score++;
+            isHitting = true;
+            makeHitFeedback();
+        }
+        else if (isHitting && inputX < resetTresholdVectorX)
+        {
+            isHitting = false;
+        }
+
+        Vector3 smoothedAccel = Vector3.Lerp(input, prevInput, 0.1f);
+        animateHammer(Mathf.Abs(smoothedAccel.x));
     }
 
     void animateHammer(float degree)
     {
-        hammerRect.rotation.Set(0, 0, degree, 0);
+        hammerRect.rotation = Quaternion.EulerAngles(0f, 0f, degree);
+    }
+
+    void makeHitFeedback()
+    {
+        int rand = Mathf.FloorToInt(Random.Range(0, hitEffects.Length));
+        audio.clip = hitEffects[rand];
+        audio.Play();
+
+        Vibration.Vibrate(40);
     }
 
     void gotoGameOver()
     {
+        PlayerPrefs.SetInt("LastScore", score);
+        if (score > PlayerPrefs.GetInt("HighScore"))
+        {
+            PlayerPrefs.SetInt("HighScore", score);
+        }
+
         actionText.text = "Time Over";
         actionUI.SetActive(true);
         pauseButton.SetActive(false);

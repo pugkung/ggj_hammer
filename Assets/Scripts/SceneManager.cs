@@ -11,4 +11,14 @@ public class SceneManager : MonoBehaviour
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
     }
+
+    void Update()
+    {
+        // TODO: allow two step exit
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Main" 
+            && Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+    }
 }
