@@ -16,9 +16,11 @@ public class GameController : MonoBehaviour
     public GameObject pauseButton;
     public GameObject pauseDialog;
     public GameObject hammerSprite;
+    public GameObject particleEffect;
 
     public AudioClip[] hitEffects;
     public AudioClip missEffect;
+    public ParticleSystem partEffect;
 
     private Text timerText;
     private Text actionText;
@@ -84,6 +86,7 @@ public class GameController : MonoBehaviour
         scoreText = scoreUI.GetComponent<Text>();
         timerText = timerUI.GetComponent<Text>();
         hammerRect = hammerSprite.GetComponent<RectTransform>();
+        partEffect = particleEffect.GetComponent<ParticleSystem>();
 
         audio = GetComponent<AudioSource>();
     }
@@ -129,7 +132,8 @@ public class GameController : MonoBehaviour
         audio.clip = hitEffects[rand];
         audio.Play();
 
-        Vibration.Vibrate(40);
+        partEffect.Play();
+        Vibration.Vibrate(50);
     }
 
     void gotoGameOver()
@@ -141,8 +145,10 @@ public class GameController : MonoBehaviour
         }
 
         actionText.text = "Time Over";
+        acceptInput = false;
+        showGameUI(false);
+        pauseDialog.SetActive(false);
         actionUI.SetActive(true);
-        pauseButton.SetActive(false);
         StartCoroutine(delayAndReturntoMainMenu());
     }
 
