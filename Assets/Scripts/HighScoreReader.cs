@@ -16,14 +16,14 @@ public class HighScoreReader : MonoBehaviour
 
         placeholder = "";
 
-        if (PlayerPrefs.GetInt("LastScore") > 0)
+        if (PlayerPrefs.GetInt("Rush_LastScore") > 0)
         {
-            placeholder += "Last Score: " + PlayerPrefs.GetInt("LastScore") + "\n";
+            placeholder += "Last Score: " + PlayerPrefs.GetInt("Rush_LastScore") + "\n";
         }
 
         if (PlayerPrefs.GetInt("HighScore") > 0)
         {
-            placeholder += "High Score: " + PlayerPrefs.GetInt("HighScore");
+            placeholder += "High Score: " + PlayerPrefs.GetInt("Rush_HighScore");
         }
 
         highScoreText.text = placeholder;

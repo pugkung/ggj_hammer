@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour
     public GameObject scoreUI;
     public GameObject pauseButton;
     public GameObject pauseDialog;
+    public GameObject tutorialUI;
     public GameObject hammerSprite;
     public GameObject particleEffect;
 
@@ -138,10 +139,10 @@ public class GameController : MonoBehaviour
 
     void gotoGameOver()
     {
-        PlayerPrefs.SetInt("LastScore", score);
-        if (score > PlayerPrefs.GetInt("HighScore"))
+        PlayerPrefs.SetInt("Rush_LastScore", score);
+        if (score > PlayerPrefs.GetInt("Rush_HighScore"))
         {
-            PlayerPrefs.SetInt("HighScore", score);
+            PlayerPrefs.SetInt("Rush_HighScore", score);
         }
 
         actionText.text = "Time Over";
@@ -160,11 +161,13 @@ public class GameController : MonoBehaviour
     IEnumerator countIn(int seconds)
     {
         showGameUI(false);
+        tutorialUI.SetActive(true);
         actionUI.SetActive(true);
         pauseDialog.SetActive(false);
 
         yield return new WaitForSeconds(seconds);
 
+        tutorialUI.SetActive(false);
         acceptInput = true;
         showGameUI(true);
         actionUI.SetActive(false);
